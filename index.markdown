@@ -4,3 +4,7 @@
 
 layout: home
 ---
+
+![profile photo](profile_photo.jpg)
+
+I'm a starting PhD student at the [distributed computing group](https://disco.ethz.ch/) at ETH Zurich. I did my undergraduate and master's studies at the University of Edinburgh, with an exchange a the University of Pennsylvania.
