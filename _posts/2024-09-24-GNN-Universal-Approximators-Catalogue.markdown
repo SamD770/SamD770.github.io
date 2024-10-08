@@ -25,11 +25,11 @@ There is a general pattern which these works use to show that their methods can 
 
 **Node identification methods** such as random node initialisation [^abboud_2021_random_init] [^sato_2021_random_features]
 
-**Spectral methods** [^kreuzer_2021_spectral_attention]
+**Spectral methods** [^kreuzer_2021_spectral_attention] Exphormer: Sparse Transformers for Graphs
 
 **Asynchronous GNN methods** 
 
-**Invariant/equivariant GNNs**
+**Invariant/equivariant GNNs**  [^maron_2018_invariant_networks] [^maron_2019_provably_powerful] [^maron_2019_universality_invariant] [^keriven_2019_universal_invariant]
 
 These approaches share similar downsides:
 
@@ -85,6 +85,52 @@ There seems to be a parrallel line of reasoning  that goes something to the effe
 2. The WL test with node ids can, in theory, solve graph isomorphism, with the condition that building a sufficiently large lookup table and hash function range to account for all $n!$ assignments of node ids is intractable in practice.
 
 
+#### Aside: Understanding Equivariant Graph Networks with Einstein summation
+
+Invariant/Equivariant networks [^maron_2018_invariant_networks] are a method of processing graph-structured data which don't appear to rely on the message-passing framework. Here I'm re-writing many of the seminal results in this field due to Maron et al.[^maron_2018_invariant_networks][^maron_2019_provably_powerful][^maron_2019_universality_invariant] using Einstein summation notation, as I found this particularly illumintating.
+
+Let $P$ be a permutation matrix, $\pi$ be the corresponding permutation. So that for the standard basis:
+
+$$e_1, e_1 \dots e_n = (1, 0, \dots, 0)^T, (0, 1, \dots, 0)^T, \dots (0, 0, \dots, 1)^T.$$
+
+We have $P e_i = e_{\pi(i)}.$
+
+Let $P \star A$ be the result of permuting an adjacency matrix $A$'s rows and columns according to $\pi$. We see that:
+
+$$(P \star A)_{ij} = (P A P^T)_{ij} = A_{\pi(i) \pi(j)}$$
+
+In Section 3 of [^maron_2018_invariant_networks] the authors consider the case of invariant/equivariant linear transformations $L: \R^{n \times n} \to \R^{n \times n}$, ie those satisfying both: 
+
+$$L(A +  \lambda B) = L(A) +  \lambda L(B)$$
+
+and
+
+$$L(P \star A) = P \star L(A)$$
+
+Basic linear algebra tells us that the first condition makes $L$ representable as a $n^2 \times n^2$ matrix, ie :
+
+$$(L A)_{ij} = {\color{lightgray}\sum_{s, t}} L_{ij}^{st} A_{st}$$
+
+for some scalars $\{L_{ij}^{st}\}_{1 \leq i, j, s, t \leq n}$ (note that the superscripts here are indices, not exponents). I have coloured the summation sign in light grey as from now on it will be ommitted, as per the [einstein summation convention](https://en.wikipedia.org/wiki/Einstein_notation). Using this notation, the LHS and RHS of the equivariance definition become:
+
+$$L(P \star A)_{ij} = L_{ij}^{st} (P \star A)_{st} = L_{ij}^{st} A_{\pi(s) \pi(t)},$$
+
+$$(P \star L(A))_{ij} = L(A)_{\pi(i)\pi(j)} = L_{\pi(i)\pi(j)}^{s't'} A_{s't'}.$$
+
+Where we have used $s', t'$ to avoid confusing summation indices. In order to get them on the same summation index, we can take $s', t' = \pi(s)\pi(t)$ and observe that the above must be true for all $A$, including those with only one non-zero entry to see that:
+
+$$L_{ij}^{st} = L_{\pi(i)\pi(j)}^{\pi(s)\pi(t)},$$
+
+which is equivalent to Equation (2) of [^maron_2018_invariant_networks] while avoiding tricky Kronecker products and matrix unstacking. We can also see that Proposition 1. of [^maron_2018_invariant_networks] will follow by noting that at no points we used the fact that there are only two indices in the above proofs, and thus we may simply replace i, j with $k$ indices $i_1, i_2, \dots i_k$ and $s, t$ with $s_1, s_k \dots s_k$ to generalise the above to $k$ th-order tensors. If we let $\pi$ be 
+
+#### Aside: Using padding to give a defintion of linearity for GNN layers (Taken from my master's dissertation).
+
+- explanation of padding invariance
+- explanation 
+
 #### Aside: 3D geometric graphs are a special subset of graphs
 
 The set of graphs which could appear in GNNs applied to biochemistry is restricted from the set of all graphs: if $u$ connects to $v$ then for all $w$ such that $w$ is closer to $u$ than $v$, ie $\lVert u - w \rVert^2 \leq \lVert u - v \rVert^2 $ we have that $u$ connects to $w$. Open question: can we rephrase this condition using eg. triangle inequality to be in purely graph theoretic language? 
+
+- Look into Florian's stress loss
+- Group in Vienna shows universality for planar graphs "Maximally Expressive GNNs for Outerplanar Graphs"
