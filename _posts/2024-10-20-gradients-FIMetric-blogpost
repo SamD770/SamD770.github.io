@@ -3,3 +3,97 @@ layout: post
 title:  "What your generative model's per-sample gradients can tell you"
 ---
 
+# What per-sample gradients can tell you about what your generative model knows
+
+This blog post is to accompany our paper,["Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection"](https://openreview.net/forum?id=EcuwtinFs9&), which has been accepted to TMLR. 
+
+Our code is available on [github](https://github.com/SamD770/Generative-Models-Knowledge). 
+
+#### Primer: why isn't the likelihood a good measure for OOD detection?
+
+- Example: Do deep generative models know what they don't know
+
+- Example: discrete data, bit strings
+
+- Example: continuous data, RGB-HSV transformation
+
+#### Primer: the Fisher Information Metric
+
+Given two distributions, what's the difference between them?
+
+
+Consider the case of a normal distribution, parameterised by it's mean and variance $(\mu, \nu)$
+
+$$
+\log p^{\mu, \nu}(x) =  - \log (2 \pi \nu) -\frac{(x - \mu)^2}{2 \nu}
+$$
+
+we see that the derivatives are thus:
+
+$$
+\frac{\partial}{\partial \mu} \log p^{\mu, \nu}(x) = \frac{x - \mu}{\nu}
+$$
+
+$$
+\frac{\partial}{\partial \nu} \log p^{\mu, \nu}(x) = -\frac{1}{\nu} + \frac{(x - \mu)^2}{2 \nu^2}
+$$
+
+The second partial derivatives are thus:
+
+$$
+\frac{\partial^2}{\partial \mu^2} \log p^{\mu, \nu}(x) = -\frac{1}{\nu}
+$$
+$$
+\frac{\partial^2}{\partial \mu \partial \nu} \log p^{\mu, \nu}(x) = \frac{\mu - x}{\nu^2}
+$$
+$$
+\frac{\partial^2}{\partial \nu^2} \log p^{\mu, \nu}(x) = \frac{1}{\nu^2} - \frac{(x - \mu)^2}{\nu^3}
+$$
+
+Taking expectations gives the Fisher Information:
+
+$$
+F^{\mu, \nu}(x) = 
+\begin{pmatrix}
+\frac{1}{\nu} & 0 \\
+0 & \frac{1}{2 \nu^2}
+\end{pmatrix}
+$$
+
+
+#### How to approximate the Fisher information metric of your deep generative model
+
+- Layman's explanation of FIM results, normal distribution of $L^2$ norm results
+
+- Layman's explanation of our method
+
+#### Beyond OOD detection
+
+- Anthropic's empirical influence functions paper
+
+#### Interesting future research directions
+
+- "OOD detection" isn't well defined, does the function of a layer correspond to the type of OOD detection it signals
+
+- Using eg. the Sherman-Morrison formula to compute unbiased MC estimates for the FIM
+
+- Adam : Our method :: Sharpness aware minimization : ? 
+
+#### Bibtex
+
+
+TODO: TMLR paper BibTex
+
+Before TMLR, Workshop paper BibTex
+
+```
+@inproceedings{gradients2023anomaly,
+  title={On Gradients of Deep Generative Models for Representation-Invariant Anomaly Detection},
+  author={Sam Dauncey and Christopher C. Holmes and Christopher Williams and Fabian Falck},
+  booktitle={ICLR 2023 Workshop on Pitfalls of limited data and computation for Trustworthy ML},
+  url={https://openreview.net/forum?id=deYF9kVmIX},
+  year={2023}
+}
+```
+
+TODO: blogpost BibTex (?)
