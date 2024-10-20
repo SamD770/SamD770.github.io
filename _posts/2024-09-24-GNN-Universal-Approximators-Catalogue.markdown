@@ -13,14 +13,27 @@ Nonetheless, a history of patching over a theoretical problem with quick fixes s
 
 ## Reading list:
 
+Papers which Sato mentions on fine-grained complexity
 
-structural message passing paper [^vingac_2020_structural_message]
+L. BABAI and E. M. Lugs: Canonical Labeling of Graphs, 15th ACM Symposium on
+Theory of Computing (1983), 171-183. -> According to Cai et al, prove that sqrt(n) is sufficient for WL-generality
 
-what NNs cannot learn, touches on similarity[^loukas_2020_cannot_learn] 
+AN OPTIMAL LOWER BOUND ON THE NUMBER OF VARIABLES
+FOR GRAPH IDENTIFICATION -> Cai et al, 
+
+[^lim_2022_sign_basis] SIGN AND BASIS INVARIANT NETWORKS FOR
+SPECTRAL GRAPH REPRESENTATION LEARNING -> claim to construct a network which is invariant to sign and basis
+
+[^murphy_2018_janossy_pooling] janossy pooling, [^murphy_2019_relational_pooling] supplementary, were they the first prove that random IDs are sufficient instead of 
+Abboud?
+
+structural message passing paper [^vingac_2020_structural_message] seems to do some limited node IDs for each small local context matrix. 
+
+What graph neural networks cannot learn: depth vs width [^loukas_2020_cannot_learn] gives a learning impossibility result based on the graph depth/width.
 
 equivalence between isomorphism and function approximation [^chen_2019_isomorphism_approximation]
 
-Review paper: Weisfeiler and Leman go Machine Learning: The Story so far
+Review paper by Grohe: Weisfeiler and Leman go Machine Learning: The Story so far
 
 ## The papers
 
@@ -34,10 +47,13 @@ There is a general pattern which these works use to show that their methods can 
 
 [This pattern of boostrapping universal approximation onto graphs may in fact be necessary for an efficient universal approximation algorithm, the graph isomorphism problem is thought to be quite hard, possibly NP-complete, and thus solving it explicitly using one's algorithm would lead to intractable numbers of computations]: #
 
-**Node identification methods** such as random node initialisation [^abboud_2021_random_init] [^sato_2021_random_features]
-relational pooling [^murphy_2019_relational_pooling] suggests that we do all permutations of the nodes as input to a neural network **TODO: read structural message passing paper [^vingac_2020_structural_message]**
+**Node identification methods** relational pooling [^murphy_2019_relational_pooling] suggests that we do all permutations of the nodes as input to a neural network and proves universal approximation, random node initialisation [^abboud_2021_random_init] does similarly [^sato_2021_random_features]
+ **TODO: read structural message passing paper [^vingac_2020_structural_message]**
 
-**Spectral methods** [^kreuzer_2021_spectral_attention] Exphormer: Sparse Transformers for Graphs
+**Spectral methods** [^kreuzer_2021_spectral_attention] show that, given the eigenvectors and eigenvalues the adjacency matrix can be reconstructed, but this requires a choice from $2^k$ signs of eigenvectors. [^lim_2022_sign_basis] 
+
+
+Exphormer: Sparse Transformers for Graphs
 
 **Asynchronous GNN methods** [^finkelshtein2024cooperative] Essentially use the randomness of the walking to give expressivity 
 
