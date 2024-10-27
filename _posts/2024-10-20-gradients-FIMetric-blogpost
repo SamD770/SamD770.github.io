@@ -19,8 +19,14 @@ Our code is available on [github](https://github.com/SamD770/Generative-Models-K
 
 #### Primer: the Fisher Information Metric
 
-Given two distributions, what's the difference between them?
+- Motivation for FIM: Given two distributions, what's the difference between them?
 
+Many different possible definitions
+Let's look at all those which differentiate
+
+- All limits lead to the FIM
+
+- Deriving typicality & hyperbolic geometry from the normal distribution's  FIM:
 
 Consider the case of a normal distribution, parameterised by it's mean and variance $(\mu, \nu)$
 
@@ -60,6 +66,7 @@ F^{\mu, \nu}(x) =
 \end{pmatrix}
 $$
 
+- FIM is deep
 
 #### How to approximate the Fisher information metric of your deep generative model
 
@@ -77,7 +84,11 @@ $$
 
 - Using eg. the Sherman-Morrison formula to compute unbiased MC estimates for the FIM
 
+- Can the FIM-induced inner product from small LMs be used for batching federated learning in LLMs?
+
 - Adam : Our method :: Sharpness aware minimization : ? 
+
+- Cramer-Rao bound near optima of DGMs(?)
 
 #### Bibtex
 
