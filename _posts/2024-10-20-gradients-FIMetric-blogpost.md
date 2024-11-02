@@ -9,7 +9,7 @@ Our code is available on [github](https://github.com/SamD770/Generative-Models-K
 
 ### Motivation
 
-Recognsing novelty is a fundamental element of cognition. With novelty recognition, we can be curious about new things, direct our attention to them, and learn from them efficiently. For those interested in AI, a natural question is thus: how can we model novelty in the information theoretic framework which underpins deep learning?
+Recognising novelty is a fundamental element of cognition. With novelty recognition, we can be curious about new things, direct our attention to them, and learn from them efficiently. For those interested in AI, a natural question is thus: how can we model novelty in the information theoretic framework which underpins deep learning?
 
 The solution may at first seem obvious: use the model likelihood! [^bishop](## "hover text") 
 
@@ -24,16 +24,26 @@ In deep learning, we start with a dataset $\bf{x}_1 \dots \bf{x}_N$ of images wh
 - Do deep generative models know what they don't know?
 
 
-![Poster from Nalisnick et al](assets\typicality-poster.png)*From Nalisnick et al.'s [poster](https://www.gatsby.ucl.ac.uk/~balaji/BDL-NeurIPS2019-typicality-poster.pdf)*
+![Nalisnick et al.'s poster](\assets\typicality-poster-new.png)
+*<center><font color="gray">
+An intuitive explanation of Nalisnick et al.'s motivation for using typicality, 
+(Source: Nalisnick et al.'s 
+<a href="https://www.gatsby.ucl.ac.uk/~balaji/BDL-NeurIPS2019-typicality-poster.pdf" target="_blank">poster</a>)
+</font></center>*
 
 So almost all the samples from a distribution can exist inside some small band of entropy values, and there can still exist very low volume regions with lower entropy than this band of values. But is the converse true? Does a sample being in this small band of entropy values mean it has the same semantic properties as the training data? Unfortunately not. 
-
 
 - Example: typicality can't explain everything 
 
 - Example: continuous data, RGB-HSV transformation
 
-- Likelihood ratios
+<center><img src="\assets\RGB-HSV-cifar-cropped.png"></center>
+
+*<center><font color="gray">
+Even simply changing the colour model has a large effect on the cross-entropy, 
+(Source: 
+<a href="https://openreview.net/forum?id=EcuwtinFs9&" target="_blank">our paper</a>)
+</font></center>*
 
 #### Primer: the Fisher Information Metric
 
@@ -111,9 +121,22 @@ $$
 #### Bibtex
 
 
-TODO: TMLR paper BibTex
+TMLR paper BibTex
 
-Before TMLR, Workshop paper BibTex
+```
+@article{
+dauncey2024approximations,
+title={Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection},
+author={Sam Dauncey and Christopher C. Holmes and Christopher Williams and Fabian Falck},
+journal={Transactions on Machine Learning Research},
+issn={2835-8856},
+year={2024},
+url={https://openreview.net/forum?id=EcuwtinFs9},
+note={}
+}
+```
+
+ICLR Workshop paper BibTex
 
 ```
 @inproceedings{gradients2023anomaly,
