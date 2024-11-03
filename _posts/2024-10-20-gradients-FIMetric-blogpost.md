@@ -15,7 +15,11 @@ MathJax.Hub.Config({
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
-This blog post is to accompany our paper,["Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection"](https://openreview.net/forum?id=EcuwtinFs9&), which has been accepted to TMLR.
+This blog post is to accompany our paper,["Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection"](https://openreview.net/forum?id=EcuwtinFs9&), which has been accepted to TMLR. It is:
+
+- A position paper on OOD detection as a whole
+- A tutorial on the counter-intuitive stats/information theory of high-dimensional models on continuous data
+- A motivation to read our paper :)
 
 Our code is available on [github](https://github.com/SamD770/Generative-Models-Knowledge). 
 
@@ -56,11 +60,15 @@ An intuitive explanation of Nalisnick et al.'s motivation for using typicality,
 
 So almost all the samples from a distribution can exist inside some band of *typical* log-likelihood values, and there can still exist very low volume regions with higher likelihoods than this band of values. But is the converse true? Does a sample being in this small band of typical values mean it has the same semantic properties as the training data? 
 
-Unfortunately not. Repeating their original experiment but this time evaluating on a dataset of celebrity faces ([CelebA](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)) instead of SVHN, we see that almost all of these celebrity faces images are contained in the band of entropy which CIFAR-10 inhabits. Revisiting our example of coin-flip strings, a string with .
+Unfortunately not. Repeating their original experiment but this time evaluating on a dataset of celebrity faces ([CelebA](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)) instead of SVHN, we see that almost all of these celebrity faces images are contained in the band of entropy which CIFAR-10 inhabits. Revisiting our example of coin-flip strings, a string with a block of 60 heads followed sequentially by 40 tails would be in the same band of likelihood values as most samples, but has a dissimilar structure.
 
-Perhaps another definition of novelty is needed.
+TODO: is this discussion necessary? Up until now, I have referred to "novelty" rather than "out-of-distribution" as a descriptor for the samples we are interested in, although the latter is more commonly used when studying this field in practice
 
-- TODO: write on likelihood ratios
+Of course, if we pre-specify a certain out-distribution $q$ that we are interested in discriminating against, then the most powerful test for discriminating against $q$ [will be given by the likelihood ratio](https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma) $\log p^{\theta}({\bf x}) - \log q({\bf x}) $[^ren]. However, with $q$ well-specified our task becomes very close to classification. Furthermore, trying to discriminate against any possible out-distribution which is inequal to the model $q \neq p^{\theta}$ will fail due to $q$s which are in a sense close to $p^{\theta}$ [^zhang] (a simple example of this for $p^{\theta}$ trained on all of CIFAR-10 would be to aversarially choose a single class of CIFAR-10 for $q$).
+
+To avoid these paradoxes, we need to slightly break from the distributional paradigm by:
+- Re-defining our problem as partitioning the data space into samples which are in a sense semantically similar to the training data and those that aren't (for now, we can simply consider pairs of semantically dissimilar image distributions)
+- Explicitly using the fact our model is a learning system instead of a fixed distribution. In our example of a block of $60$ heads and a block of $40$ tails, no model constrained to always interpreting the coin tosses as unordered or i.i.d. will be able to capture the novelty here, whereas a model which has learned itself that the training dataset exhibits this structure might be able to *if* we allow it to explore outside its learned parameters.
 
 #### Primer: representation dependence
 
@@ -206,4 +214,6 @@ TODO: blogpost BibTex (?)
 
 [^serra]: input complexity
 
-[^]
+[^ren]: likelihood ratios
+
+[^zhang]: understanding failures
