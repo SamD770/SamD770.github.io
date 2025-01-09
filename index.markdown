@@ -12,5 +12,5 @@ I'm a starting PhD student at the [distributed computing group](https://disco.et
 My current research interests include (as of January 2025):
  
 - transformer token merging
-- LLM forecasting
+- LLM capabilities forecasting
 - interpreting sequence-to-sequence models as distributed systems
