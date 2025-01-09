@@ -9,8 +9,8 @@ layout: home
 
 I'm a starting PhD student at the [distributed computing group](https://disco.ethz.ch/) at ETH Zurich. I did my undergraduate and master's studies at the University of Edinburgh, with an exchange at the University of Pennsylvania.
 
-My current research interests include:
+My current research interests include (as of January 2025):
  
-- coarsened sparsity in neural network architectures
-- un/self/semi-supervised learning on nanoscale systems
-- theoretical limitations of graph neural networks
+- transformer token merging
+- LLM forecasting
+- interpreting sequence-to-sequence models as distributed systems
