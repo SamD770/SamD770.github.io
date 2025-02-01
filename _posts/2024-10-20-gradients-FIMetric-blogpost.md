@@ -15,13 +15,13 @@ MathJax.Hub.Config({
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
-This blog post is to accompany our paper,["Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection"](https://openreview.net/forum?id=EcuwtinFs9&), which has been accepted to TMLR. 
+This blog post is to complement our paper,["Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection"](https://openreview.net/forum?id=EcuwtinFs9&), which has been accepted to TMLR. 
 
 <!-- It is intended to be:
 
-- A position paper on OOD detection as a whole.
+- A position paper on OOD/novelty detection as a whole.
 - A tutorial on the counter-intuitive stats/information theory of high-dimensional models on continuous data.
-- A simplified explanation of our results. -->
+- If you want a detailed description of our methodology and results, please go to our paper. -->
 
 [Our code](https://github.com/SamD770/Generative-Models-Knowledge) is available on github. 
 
@@ -64,12 +64,12 @@ An intuitive explanation of Nalisnick et al.'s motivation for using typicality,
 
 So almost all the samples from a distribution can exist inside some band of *typical* log-likelihood values, and there can still exist very low volume regions with higher likelihoods than this band of values. But is the converse true? Does a sample being in this small band of typical values mean it has the same semantic properties as the training data? 
 
-Unfortunately not. Repeating their original experiment but this time evaluating on a dataset of celebrity faces ([CelebA](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)) instead of SVHN, Nalisnick et al. [^typicality] that almost all of these celebrity faces images are contained in the band of likelihood which CIFAR-10 inhabits. Revisiting our example of coin-flip strings, a string with a block of 60 heads followed sequentially by 40 tails would be in the same band of likelihood values as most samples, but has a dissimilar structure.
+Unfortunately not. Repeating their original experiment but this time evaluating on a dataset of celebrity faces ([CelebA](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)) instead of SVHN, Nalisnick et al.report [^typicality] that almost all of these celebrity faces images are contained in the band of likelihood which CIFAR-10 inhabits. Revisiting our example of coin-flip strings, a string with a block of 60 heads followed sequentially by 40 tails would be in the same band of likelihood values as most samples, but has a dissimilar structure.
 
 Up until now, I have used the term "novelty" rather than more popular "out-of-distribution" (which we also use in our paper). This is because I think that the term "novelty" more intuitively captures the notion of a task which is both distinct from classification and possible. 
 To elucidate what I mean here, consider these results:
 
-If we pre-specify a certain out-distribution $q$ that we are interested in discriminating against, then the most powerful test for discriminating against $q$ [will be given by the likelihood ratio](https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma) $\log p^{\theta}({\bf x}) - \log q({\bf x}) $[^ren]. However, with $q$ well-specified our task becomes very close to classification. Furthermore, trying to discriminate against any possible out-distribution which is inequal to the model $q \neq p^{\theta}$ will fail due to $q$s which are in a sense close to $p^{\theta}$ [^zhang] (a simple example of this for $p^{\theta}$ trained on all of CIFAR-10 would be to adversarially choose a single class of CIFAR-10 for $q$).
+If we pre-specify a certain out-distribution $q$ that we are interested in discriminating against, then the most powerful test for discriminating against $q$ [will be given by the likelihood ratio](https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma) $\log p^{\theta}({\bf x}) - \log q({\bf x}) $[^ren]. However, with $q$ well-specified our task becomes very close to classification. Furthermore, trying to discriminate against _any_ possible out-distribution which is inequal to the model $q \neq p^{\theta}$ will fail due to $q$s which are in a sense close to $p^{\theta}$ [^zhang] (a simple example of this for $p^{\theta}$ trained on all of CIFAR-10 would be to adversarially choose a single class of CIFAR-10 for $q$).
 
 To avoid these paradoxes, we need to slightly break from the distributional paradigm by:
 - Re-defining our problem as partitioning the data space into samples which are semantically similar to the training data and those that aren't (for now, we can simply consider distinguishing pairs of semantically dissimilar image distributions).
@@ -78,16 +78,14 @@ To avoid these paradoxes, we need to slightly break from the distributional para
 #### Plan from here:
 
 Gradients for anomaly detection
-- Simple motivation for the gradient
-- What type of novelty does the gradient capture?
-- How do we measure the size of the gradient?
+- Simple motivation for using learn-ability as a method of measuring novelty (brainstorm this)
+- Derivation of gradients from a general "can you update to improve your model of the world"
 
 Theory: natural Gradients
-- FIM is induced delta of KL
+- High-level introduction to natural gradients, cite amari mostly, don't try to re-define everything
 - Using FIM on normal distribution _including variance term_ recovers something typicality-esque 
 
 Theory: representation dependence
-- already written mostly
 - write up Normalising flow example
 
 Future research directions
@@ -97,18 +95,15 @@ Future research directions
 
 Bearing the above in mind, we can come to a definition of novelty that extends beyond how probable a sample is: we can say that a sample contains novelty if it contains unlearned, but learnable, structure.
 
-Consdier the following scenario: while driving in your car, you observe a cloud shape that you haven't seen before. 
+Consider the following scenario: while driving in your car, you observe a cloud shape that you haven't seen before. 
 This exact configuration of the cloud is highly unlikely under your world model, yet you don't stop to learn the exact structure of the cloud, as doing so doesn't teach you about future clouds.
 All the unpredictable structure of the cloud is at least for a human observer, unlearnable.
-In contrast, consider observing a skateboarder(?)
+In contrast, consider observing a skateboarder on the road for the first time. There's learnable information about how the skateboarder
 
 - want an example that manifestly equates likelihoods yet one is obviously novel and the other is obviously not
 
 - a car version that you have seen before -> not novel as you don't update much
 - a car version that you have not seen before -> novel, you can learn it and add to your mental dictionary
-
-Consider the following scenario: while driving in your car you observe two objects: 1. A cloud with a shape you haven't seen before 2. A car with a shape that you haven't seen before.
-Th
 
 Consider your reaction to discovering the outcome of two events: 1. a coin flip vs 2. a very tight election.
 Both of the events have outcomes with roughly $p = 0.5$ in your world model, but the discovering the binary outcome of the election is much more _interesting_, it provides a rich trove of information for your world model as to how voter opinions have drifted in comparison to polling, perceived likability of the candidates, et cetera. 
@@ -116,6 +111,62 @@ This information could be used to update your world model to make your predictio
 
 Note here that the definition is not fully complete, the election outcome is also _interesting_ because it updates your world model as to what the future will be. 
 For example, if a country were decide to flip a coin to decide its leader. Is this novel?
+
+Consider this: you're GPT-3, mid training run. 
+
+First, you view 10 "1" and "0" characters from some plaintext representation of an encrypted file. it's leaked into your training data, perhaps someone posted it on reddit. Viewing 10 tokens from this string is essentially like viewing 10 Coin flips: the entropy is irreducible, it's not "novel" to you even if it contains 10 bits of information.
+
+The string "453 + 362 = " appears to you. You can't quite yet do addition, you know that it has something to do with outputting digits, so all you can do is output a uniform distribution of the digits 0-9. However, the $\approx 10$ bits of information given in the answer "818" 
+
+---
+
+In general, for a model $M$ and a learning algorithm $step$, evalutation function $eval$ we define novelty of a sample to be:
+
+$$
+  Novelty(x, M, step) = eval(M, x) - eval(step(M, x), x)
+$$
+
+Why use $eval(M, x) = -\log p^M(x)$ instead of eg. $p^M(x)$ or $p^M(x)^2$?
+
+If $eval$ and $step$ work together, we need that $eval(step(M, x), x) \geq eval(M, x)$. In general, we cannot expect for $eval(step(M, x), x) = eval(M, x)$ for all $x \sim p^M$ as repetitively training on one sample can (and should) lead to model collapse. 
+
+We would ideally have that our novelty algorithm is probably approximately correct, ie that:
+
+$$
+\mathbb{P}_{x \sim P^{M}}(Novelty(x, M, step) < \epsilon_1) > 1 - \epsilon_2
+$$
+
+However, for a batch-based training algorithm we can guarantee that, in the limit for large batch sizes, we have $Novelty(x, M, step) < \epsilon$:
+
+$$
+
+$$
+
+We wish for $eval(M, x)$ to be, in expectation, unhackable, such that if $M$ is the true model 
+
+$$
+  \mathbb{E}_{x \sim M'} \left{ \eval(M, x) \right}
+$$
+
+In terms of SGD:
+
+\[
+  step(M^{\theta}, x) 
+  = 
+  M^{\theta + \eta \frac{\partial}{\partial \theta}}
+\]
+
+And thus
+
+\[
+  eval(step(M^{\theta}, x), x)
+  = 
+  eval(M^{\theta + \eta \frac{\partial}{\partial \theta}}, x)
+  = 
+  \log p (x)
+\]
+
+---
 
 Deep learning models are trained using gradients, so examining the gradient gives us a natural way to measure how much learnable structure there is in a sample.
 For samples with structure that is already learned or unlearnable, we would expect the magnitude of the _gradient_ of the likelihood to be small, as updating the model's parameters with this gradient would not influence how well the sample's structure can be predicted.
