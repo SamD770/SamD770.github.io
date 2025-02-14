@@ -15,3 +15,5 @@ My current research interests include (as of February 2025):
  
 - Interpreting sequence-to-sequence models as distributed systems
 - Interpreting why transformer [token merging](https://openreview.net/pdf?id=JroZRaRw7Eu) works
+
+Are you a student looking for a thesis or collaboration? see my [university profile page](https://disco.ethz.ch/members/sdauncey) for current projects.
