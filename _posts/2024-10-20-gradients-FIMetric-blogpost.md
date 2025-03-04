@@ -15,15 +15,12 @@ MathJax.Hub.Config({
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
-This blog post is to complement our paper,["Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection"](https://openreview.net/forum?id=EcuwtinFs9&), which has been accepted to TMLR. 
+This blog post is to complement our paper,["Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection"](https://openreview.net/forum?id=EcuwtinFs9&), was accepted to TMLR.
 
-<!-- It is intended to be:
+The work done in the paper is ~ 2.5 years old by now (so in AI research time it co-existed with the dinosaurs) but I wrote this post to accessibly convey: 
 
-- A position paper on OOD/novelty detection as a whole.
-- A tutorial on the counter-intuitive stats/information theory of high-dimensional models on continuous data.
-- If you want a detailed description of our methodology and results, please go to our paper. -->
-
-[Our code](https://github.com/SamD770/Generative-Models-Knowledge) is available on github. 
+- My intuitions on OOD/novelty detection as a whole.
+- Some intuitions behind what I think is the link between OOD/novelty detection and optimization.
 
 ### Motivation
 
@@ -75,173 +72,64 @@ To avoid these paradoxes, we need to slightly break from the distributional para
 - Re-defining our problem as partitioning the data space into samples which are semantically similar to the training data and those that aren't (for now, we can simply consider distinguishing pairs of semantically dissimilar image distributions).
 - Explicitly using the fact our model is a learning system instead of a fixed distribution. In our example of a block of $60$ heads and a block of $40$ tails, no model constrained to always interpreting the coin tosses as unordered or i.i.d. will be able to capture the novel structure here, whereas a model which has learned itself that the training dataset exhibits this structure might be able to *if* we allow it to explore outside its learned parameters.
 
-#### Plan from here:
-
-Gradients for anomaly detection
-- Simple motivation for using learn-ability as a method of measuring novelty (brainstorm this)
-- Derivation of gradients from a general "can you update to improve your model of the world"
-
-Theory: natural Gradients
-- High-level introduction to natural gradients, cite amari mostly, don't try to re-define everything
-- Using FIM on normal distribution _including variance term_ recovers something typicality-esque 
-
 #### Beyond the likelihood: gradients for novelty detection
 
 Bearing the above in mind, we can come to a definition of novelty that extends beyond how probable a sample is: we can say that a sample contains novelty if it contains unlearned, but learnable, structure. 
 
-_True noise should not be novel, as long as an agent roughly understand the noising process._
+_True noise should not be novel, as long as an agent roughly understands the noising process._
 
 But can't something appear to be noise yet actually be produced by some very complex process? _yes_ but then this is still noisy and thus non-novel _relative to you_, until you grok the complex process.
 
 Consider the following scenario: while driving in your car, you observe a cloud shape that you haven't seen before. 
-This exact configuration of the cloud is highly unlikely under your world model, yet you don't stop to learn the exact structure of the cloud, as doing so doesn't teach you about future clouds.
+As there are many possible cloud shapes, this exact configuration of the cloud may be highly unlikely under your world model, yet you don't stop to learn the exact structure of the cloud, and wouldn't describe it as truly "novel".
 All the unpredictable structure of the cloud is at least for a human observer, unlearnable.
-In contrast, consider observing a skateboarder on the road for the first time. There's learnable information what a skateboarder is and how they behave baked into this observation. 
+In contrast, consider observing a skateboarder on the road for the first time. There's learnable information what a skateboarder is and how they behave baked into this observation, so the experience is novel. 
 
-- want an example that manifestly equates likelihoods yet one is obviously novel and the other is obviously not
-
-- a car version that you have seen before -> not novel as you don't update much
-- a car version that you have not seen before -> novel, you can learn it and add to your mental dictionary
-
-Consider your reaction to discovering the outcome of two events: 1. a coin flip vs 2. a very tight election.
-Both of the events have outcomes with roughly $p = 0.5$ in your world model, but the discovering the binary outcome of the election is much more _interesting_, it provides a rich trove of information for your world model as to how voter opinions have drifted in comparison to polling, perceived likability of the candidates, et cetera. 
-This information could be used to update your world model to make your predictions of other election outcomes better, demonstrating how the election outcome contains unlearned, but learnable, information. 
-
-Note here that the definition is not fully complete, the election outcome is also _interesting_ because it updates your world model as to what the future will be. 
-For example, if a country were decide to flip a coin to decide its leader. Is this novel?
-
-Consider this: you're GPT-3, mid training run. 
+<!-- Consider this more mathematical example: you're GPT-3, mid training run. 
 
 First, you view 10 "1" and "0" characters from some plaintext representation of an encrypted file. it's leaked into your training data, perhaps someone posted it on reddit. Viewing 10 tokens from this string is essentially like viewing 10 Coin flips: the entropy is irreducible, it's not "novel" to you even if it contains 10 bits of information.
 
-The string "453 + 362 = " appears to you. You can't quite yet do addition, you know that it has something to do with outputting digits, so all you can do is output a uniform distribution of the digits 0-9. However, the $\approx 10$ bits of information given in the answer "818" 
-
----
-
-In general, for a model $M$ and a learning algorithm $step$, evalutation function $eval$ we define novelty of a sample to be:
-
-$$
-  Novelty(x, M, step) = eval(M, x) - eval(step(M, x), x)
-$$
-
-Why use $eval(M, x) = -\log p^M(x)$ instead of eg. $p^M(x)$ or $p^M(x)^2$?
-
-If $eval$ and $step$ work together, we need that $eval(step(M, x), x) \geq eval(M, x)$. In general, we cannot expect for $eval(step(M, x), x) = eval(M, x)$ for all $x \sim p^M$ as repetitively training on one sample can (and should) lead to model collapse. 
-
-We would ideally have that our novelty algorithm is probably approximately correct, ie that:
-
-$$
-\mathbb{P}_{x \sim P^{M}}(Novelty(x, M, step) < \epsilon_1) > 1 - \epsilon_2
-$$
-
-However, for a batch-based training algorithm we can guarantee that, in the limit for large batch sizes, we have $Novelty(x, M, step) < \epsilon$:
-
-$$
-
-$$
-
-We wish for $eval(M, x)$ to be, in expectation, unhackable, such that if $M$ is the true model 
-
-$$
-  \mathbb{E}_{x \sim M'} \left{ \eval(M, x) \right}
-$$
-
-In terms of SGD:
-
-\[
-  step(M^{\theta}, x) 
-  = 
-  M^{\theta + \eta \frac{\partial}{\partial \theta}}
-\]
-
-And thus
-
-\[
-  eval(step(M^{\theta}, x), x)
-  = 
-  eval(M^{\theta + \eta \frac{\partial}{\partial \theta}}, x)
-  = 
-  \log p (x)
-\]
-
----
+The string "453 + 362 = " appears to you. You can't quite yet do addition, you know that it has something to do with outputting digits, so all you can do is output a uniform distribution of the digits 0-9. However, the $\approx 10$ bits of information given in the answer "815"  -->
 
 Deep learning models are trained using gradients, so examining the gradient gives us a natural way to measure how much learnable structure there is in a sample.
-For samples with structure that is already learned or unlearnable, we would expect the magnitude of the _gradient_ of the likelihood to be small, as updating the model's parameters with this gradient would not influence how well the sample's structure can be predicted.
-We now have two problems:
-- what, specifically, do we take the gradient of? (eg, why the log-likelihood and not the likelihood?)
-- How do we measure the size of the gradient in a canonical way? 
+For samples with structure that is already learned or unlearnable, we would expect the magnitude of the _gradient_ to be small, as updating the model's parameters with this gradient would not influence how well the sample's structure can be predicted.
 
-To convince a skeptical reader that the gradient of the log-likelihood is a natural candidate to measure this, we consider two parts of theory: one from Amari, and one from myself.
+<!-- We now have two problems:
+- what, specifically, do we take the gradient of? (eg, why the log-likelihood and not the likelihood?)
+- How do we measure the size of the gradient in a canonical way?  -->
 
 #### Theory Primer: the Fisher Information Metric
 
-- Citation for Amari
+Let's put the above intuition into math: we want to use gradients, but what do we take the gradient of and how do we measure its size?
 
-- Motivation for FIM: Given two distributions, what's the difference between them?
-
-Many different possible definitions
-Let's look at all those which differentiate
-
-- All limits lead to the FIM
-
-- Deriving typicality & hyperbolic geometry from the normal distribution's  FIM:
-
-Consider the case of a normal distribution, parameterised by it's mean and variance $(\mu, \nu)$
+Firstly, we should take the gradient of the log-likelihood. The log is _the_ function which satisfies Gibb's inequality, meaning that a maximising the log-likelihood is equivalent to matching the data distribution:
 
 $$
-\log p^{\mu, \nu}(x) =  - \log (2 \pi \nu) -\frac{(x - \mu)^2}{2 \nu}
+\mathbb{E}_{x \sim p} \log p(x) \geq \mathbb{E}_{x \sim p} \log p^{\theta}(x)
+\quad
+\text{for all } \theta
 $$
 
-we see that the derivatives are thus:
+This means that if the distribution has been fully learned and $p^{\theta} = p$, then in expectation, $\nabla_{\theta} \log p^{\theta} ({\bf x})$ equals $0$. We can generalise this to saying that a new distribution $q$ contains no learnable (and thus novel) structure respect to a model $p^{\theta}$ if the model is at a local minimum. In these cases, if we average the gradient over a sufficiently large batch of samples from $q$, it converges to zero. Conversely, if there is learable structure in $q$, there will be a direction in parameter space where we can nudge the model and improve the expected log-likelihood.
 
-$$
-\frac{\partial}{\partial \mu} \log p^{\mu, \nu}(x) = \frac{x - \mu}{\nu}
-$$
+Now, how do we measure the size of this gradient? Deep learning models have many parameters, performing different functions in the model. Moreover, the raw gradient is sensitive to parameter rescaling. For example, by shrinking the values of the parameter by a factor of $10$, and then re-multipying by a factor of $10$ as part of the model inference, the model becomes much more sensitive to this parameter and its gradient becomes $10$ x higher, despite the model distribution not changing. So how do we find a canonical way to measure the size of a parameter vector?
 
-$$
-\frac{\partial}{\partial \nu} \log p^{\mu, \nu}(x) = -\frac{1}{\nu} + \frac{(x - \mu)^2}{2 \nu^2}
-$$
+What we can do is ask "how much will a small parameter update $d \theta$ affect my model distribution"? Looking at the KL divergence between the original and updated distributions (and remembering that the first-order term is zero for the reasons discussed above) gives us the approximation:
 
-The second partial derivatives are thus:
+$$\mathbb{E}_{x \sim p^{\theta} } \log p^{\theta} ({\bf x}) - \mathbb{E}_{x \sim p^{\theta} } \log p^{\theta + d \theta} ({\bf x})  \approx  (d \theta)^T F^\theta (d \theta) + O((d \theta)^3)$$
 
-$$
-\frac{\partial^2}{\partial \mu^2} \log p^{\mu, \nu}(x) = -\frac{1}{\nu}
-$$
-$$
-\frac{\partial^2}{\partial \mu \partial \nu} \log p^{\mu, \nu}(x) = \frac{\mu - x}{\nu^2}
-$$
-$$
-\frac{\partial^2}{\partial \nu^2} \log p^{\mu, \nu}(x) = \frac{1}{\nu^2} - \frac{(x - \mu)^2}{\nu^3}
+Where the matrix in the second order term is:
+
+$$F^\theta = \mathbb{E}_{x \sim p^{\theta} } \frac{d^2}{\partial \theta_i \partial \theta_j} \log p^{\theta} ({\bf x}),$$
+
+which is called the _Fisher Information Matrix_ . The idea is that the entries of this matrix tell you how sensitive the model is to updating each pair of parameters. Thus, when given a sample $x$ and told to estimate the size of its gradient, it makes sense to normalise the update by dividing by these sensitivity values, giving the Fisher Information _Metric_:
+
+$$\left\lVert \nabla_{\theta} \log p^{\theta} ({\bf x}) \right\rVert_{FIM} 
+= 
+\nabla_{\theta} \log p^{\theta} ({\bf x})^T \left(F^\theta\right)^{-1} \nabla_{\theta} \log p^{\theta} ({\bf x})
 $$
 
-Taking expectations gives the Fisher Information:
-
-$$
-F^{\mu, \nu}(x) = 
-\begin{pmatrix}
-\frac{1}{\nu} & 0 \\
-0 & \frac{1}{2 \nu^2}
-\end{pmatrix}
-$$
-- FIM is deep
-
-#### How to approximate the Fisher information metric of your deep generative model
-
-<center><img src="\assets\FIM-windows.png"></center>
-
-*<center><font color="gray">
-The FIM of generative models can be approximated as diagonal, 
-(Source: 
-<a href="https://openreview.net/forum?id=EcuwtinFs9&" target="_blank">our paper</a>)
-</font></center>*
-
-
-- Layman's explanation of FIM results, normal distribution of $L^2$ norm results
-
-- Layman's explanation of our method
-
-- Intuition of our method: learnability
+The field of optimization figured out almost $30$ years ago [^Amari] that this is the most natural way to measure the size of a gradient vector. All the most commonly used  optimizers (such as Adam and RMS prop) attempt to compute the steepest direction when measured by the Fisher Information Metric, but, like us, they have to make approximiations for this calculation to be tractable.
 
 #### Primer: representation dependence in continuous data
 
@@ -297,7 +185,7 @@ $$
 
 For most generative models, this means that the entire initialisation, training, and sampling processes can be defined without ever implicitly assigning volumes to the input space.
 
-**Example: how to compute gradients for your normalising flow without using volumes.** Normalising flows, and their continuous cousins [^neural_odes], learn an invertible mapping from a latent space to the $f_{\theta}: \mathcal{Z} \to \mathcal{X}$ such that the distribution of $f_{\theta}^{-1}({\bf x})$ for ${\bf x} \sim p$ is some easy-to-compute distribution (for example, a standard normal distribution). The model likelihood $p^{\theta}({\bf x})$ is then given by the change-of-variables formula:
+**Example: how to computing a parameter derivative of your normalising flow without using volumes.** (Continuous) Normalising flows learn an invertible mapping from a latent space to the $f_{\theta}: \mathcal{Z} \to \mathcal{X}$ such that the distribution of $f_{\theta}^{-1}({\bf x})$ for ${\bf x} \sim p$ is some easy-to-compute distribution (for example, a standard normal distribution). The model likelihood $p^{\theta}({\bf x})$ is then given by the change-of-variables formula:
 
 $$
 \log p^{\theta}({\bf x}) 
@@ -332,7 +220,7 @@ Note that at no point in this process do we need to use volumes in $\mathcal{X}$
 
 As I've started my PhD I've changed tack with my research. Below are some ideas that I find interesting for future research in this topic, feel free to run with them:
 
-- Empirical influence functions essentially take the FIM-induced dot-product between two different gradient vectors instead of the FIM-induced norm as we do. 
+- Empirical influence functions essentially take the FIM-induced dot-product between two different gradient vectors instead of the FIM-induced norm as we did. 
 First suggested by Koh et al. [^koh], this gives a metric of how influential a training sample is in generating a given outcome.
 Recently, Anthropic [^grosse] demonstrated some very interesting (if slightly worrying) results about how an LLM decides to request to not be shutdown based on the script of Kubrick's _2001: A Space Odyssey_, amongst other things.
 There is definitely some interesting work to be done in relating these works by, for example, computing the FIM-induced norm on the train set to see which samples were overall most novel, at least when first exposed to the model.
@@ -353,6 +241,8 @@ s ((k + 1) F_k)^{-1} s^\mathsf{T} =
 s \left(k F_{k-1}+ s_{k-1}  s_{k-1}^\mathsf{T}\right)^{-1} s^\mathsf{T}
 = s (k F_{k-1}^{-1}) s^\mathsf{T}- \frac {s (k F_{k-1})^{-1} s_{k-1} s_{k-1}^\mathsf{T} (k F_{k-1})^{-1}s^\mathsf{T}} {1 +  s_{k-1}^\mathsf{T}(k F_{k-1})^{-1} s_{k-1}}.
 $$
+
+Seeing if this more expensive computation gives better results would be great!
 
 - Do the FIM-induced norms of small models correlate with those of larger models? If so, can we apply insights from computing FIM-norms on small models to efficient curriculum/federated/active learning schemes on large models?
 
@@ -393,7 +283,7 @@ TODO: blogpost BibTex (?)
 
 #### References
 
-[^bishop]: Bishop citation.
+[^bishop]: Novelty detection and neural network validation.
 
 [^Nalisnick]: Do deep generative models know what they don't know?
 
@@ -414,4 +304,4 @@ In International Conference on Machine Learning, pages 1885–1894. PMLR, 2017.
 
 [^lelan]: Perfect Density Models Cannot Guarantee Anomaly Detection
 
-[^neural_odes]: Neural Ordinary Differential Equations
+[^Amari]: natural gradient works efficiently in learning
