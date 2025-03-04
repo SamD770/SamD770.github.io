@@ -17,7 +17,7 @@ MathJax.Hub.Config({
 
 This blog post is to complement our paper,["Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection"](https://openreview.net/forum?id=EcuwtinFs9&), was accepted to TMLR.
 
-The work done in the paper is ~ 2.5 years old by now (so in AI research time it co-existed with the dinosaurs) but I wrote this post to accessibly convey: 
+The work done in the paper is ~ 2.5 years old by now but I wrote this post to accessibly convey: 
 
 - My intuitions on OOD/novelty detection as a whole.
 - Some intuitions behind what I think is the link between OOD/novelty detection and optimization.
@@ -74,7 +74,7 @@ To avoid these paradoxes, we need to slightly break from the distributional para
 
 #### Beyond the likelihood: gradients for novelty detection
 
-Bearing the above in mind, we can come to a definition of novelty that extends beyond how probable a sample is: we can say that a sample contains novelty if it contains unlearned, but learnable, structure. 
+Bearing the above in mind, we can come to a definition of novelty that extends beyond how likely a sample is: we can say that a sample contains novelty if it contains unlearned, but learnable, structure. 
 
 _True noise should not be novel, as long as an agent roughly understands the noising process._
 
@@ -124,12 +124,10 @@ $$F^\theta = \mathbb{E}_{x \sim p^{\theta} } \frac{d^2}{\partial \theta_i \parti
 
 which is called the _Fisher Information Matrix_ . The idea is that the entries of this matrix tell you how sensitive the model is to updating each pair of parameters. Thus, when given a sample $x$ and told to estimate the size of its gradient, it makes sense to normalise the update by dividing by these sensitivity values, giving the Fisher Information _Metric_:
 
-$$\left\lVert \nabla_{\theta} \log p^{\theta} ({\bf x}) \right\rVert_{FIM} 
-= 
-\nabla_{\theta} \log p^{\theta} ({\bf x})^T \left(F^\theta\right)^{-1} \nabla_{\theta} \log p^{\theta} ({\bf x})
-$$
+$$\left\lVert \nabla_{\theta}  \log p^{\theta} ({\bf x}) \right\rVert _{FIM} = \nabla_{\theta} \log p^{\theta} ({\bf x})^T \left(F^\theta\right)^{-1} \nabla_{\theta} \log p^{\theta} ({\bf x})$$
 
-The field of optimization figured out almost $30$ years ago [^Amari] that this is the most natural way to measure the size of a gradient vector. All the most commonly used  optimizers (such as Adam and RMS prop) attempt to compute the steepest direction when measured by the Fisher Information Metric, but, like us, they have to make approximiations for this calculation to be tractable.
+
+The field of optimization figured out almost $30$ years ago [^Amari] that this is the most natural way to measure the size of a gradient vector. All the most commonly used  optimizers (such as Adam and RMS prop) attempt to compute the steepest direction when measured by the Fisher Information Metric. Unfortunately, one has to make various approximiations for this calculation to be tractable.
 
 #### Primer: representation dependence in continuous data
 
@@ -283,25 +281,24 @@ TODO: blogpost BibTex (?)
 
 #### References
 
-[^bishop]: Novelty detection and neural network validation.
+[^bishop]: [_Novelty Detection and Neural Network Validation_](https://doi.org/10.1007/978-1-4471-2063-6_225), Chrisopher M. Bishop, 1993
 
-[^Nalisnick]: Do deep generative models know what they don't know?
+[^Nalisnick]: [_Do Deep Generative Models Know What They Don't Know?_](https://openreview.net/forum?id=H1xwNhCcYm), Eric Nalisnick et al., 2019
 
-[^choi]: WAIC, but why?
+[^choi]: [_Waic, but why? generative ensembles for robust anomaly detection_](https://arxiv.org/abs/1810.01392), Hyunsun Choi et al., 2018
 
-[^typicality]: typicality
+[^typicality]: [_Detecting Out-of-Distribution Inputs to Deep Generative Models Using Typicality_](https://arxiv.org/abs/1906.02994), Eric Nalisnick et al., 2019
 
-[^serra]: input complexity
+[^serra]: [_Input Complexity and Out-of-distribution Detection with Likelihood-based Generative Models_](https://openreview.net/forum?id=SyxIWpVYvr), Joan Serrà et al., 2020
 
-[^ren]: likelihood ratios
+[^ren]: [_Likelihood Ratios for Out-of-Distribution Detection_](https://proceedings.neurips.cc/paper/2019/file/1e79596878b2320cac26dd792a6c51c9-Paper.pdf), Jie Ren et al., 2019
 
-[^zhang]: understanding failures
+[^zhang]: [_Understanding failures in out-of-distribution detection with deep generative models_](https://proceedings.mlr.press/v139/zhang21g.html), Lily Zhang et al., 2021
 
-[^koh]: Pang Wei Koh and Percy Liang. Understanding black-box predictions via influence functions.
-In International Conference on Machine Learning, pages 1885–1894. PMLR, 2017.
+[^koh]: [_Understanding Black-box Predictions via Influence Functions_](https://proceedings.mlr.press/v70/koh17a.html), Pang Wei Koh and Percy Liang, 2017
 
-[^grosse]: Studying Large Language Model Generalization with Influence Functions
+[^grosse]: [_Studying Large Language Model Generalization with Influence Functions_](https://arxiv.org/abs/2308.03296), Roger Grosse et al., 2023
 
-[^lelan]: Perfect Density Models Cannot Guarantee Anomaly Detection
+[^lelan]: [_Perfect Density Models Cannot Guarantee Anomaly Detection_](https://www.mdpi.com/1099-4300/23/12/1690), Charline Le Lan and Laurent Dinh, 2021
 
-[^Amari]: natural gradient works efficiently in learning
+[^Amari]: [_Natural Gradient Works Efficiently in Learning_](https://direct.mit.edu/neco/article-abstract/10/2/251/1731/Natural-Gradient-Works-Efficiently-in-Learning?redirectedFrom=fulltext), Shun-ichi Amari, 1998
