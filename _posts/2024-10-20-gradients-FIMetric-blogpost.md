@@ -17,7 +17,7 @@ MathJax.Hub.Config({
 
 This blog post is to complement our paper,["Approximations to the Fisher Information Metric of Deep Generative Models for Out-Of-Distribution Detection"](https://openreview.net/forum?id=EcuwtinFs9&), was accepted to TMLR.
 
-The work done in the paper is ~ 2.5 years old by now but I wrote this post to accessibly convey: 
+The work done in the paper is ~ 2.5 years old at the time of writing but I wrote this post to accessibly convey: 
 
 - My intuitions on OOD/novelty detection as a whole.
 - Some intuitions behind what I think is the link between OOD/novelty detection and optimization.
